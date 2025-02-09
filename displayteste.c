@@ -201,11 +201,12 @@ int main()
         }
         else{
             imprimir_desenho(matriz,pio,sm);//desligando a matriz
+            // Exibe o caractere no display
+            ssd1306_draw_string(ssd, 5, 0, buffer);
+            render_on_display(ssd, &frame_area);
         }
 
-        // Exibe o caractere no display
-        ssd1306_draw_string(ssd, 5, 0, buffer);
-        render_on_display(ssd, &frame_area);
+        
 
         // Aguarda um segundo antes de ler o próximo caractere
         sleep_ms(1000);
@@ -234,21 +235,42 @@ void gpio_irq_handler1(uint gpio, uint32_t events)
 
     char *texto1 = "verde ligado";
     char *texto2 = "azul ligado";
+    char *texto3 = "verde desligado";
+    char *texto4 = "azul desligado";
     uint32_t current = to_ms_since_boot(get_absolute_time());
     
     if(gpio == button_A && current - anta > 200){
+        
         anta = current;
-        gpio_put(LED_B,0);
-        gpio_put(LED_G, 1);
-        ssd1306_draw_string(ssd, 5, 0, texto1);
-        render_on_display(ssd, &frame_area);
+        if(!gpio_get(LED_G)){
+            gpio_put(LED_B,0);
+            gpio_put(LED_G, 1);
+            ssd1306_draw_string(ssd, 5, 0, texto1);
+            render_on_display(ssd, &frame_area);    
+        }
+        else{
+            gpio_put(LED_B,0);
+            gpio_put(LED_G, 0);
+            ssd1306_draw_string(ssd, 5, 0, texto3);
+            render_on_display(ssd, &frame_area);    
+        }
+        
     }
     else if(gpio == button_B && current - antb > 200){
         antb = current;
-        gpio_put(LED_G, 0);
-        gpio_put(LED_B, 1);
-        ssd1306_draw_string(ssd, 5, 0, texto2);
-        render_on_display(ssd, &frame_area);
+        if(!gpio_get(LED_B)){
+            gpio_put(LED_G, 0);
+            gpio_put(LED_B, 1);
+            ssd1306_draw_string(ssd, 5, 0, texto2);
+            render_on_display(ssd, &frame_area);
+        }
+        else{
+            gpio_put(LED_G, 0);
+            gpio_put(LED_B, 0);
+            ssd1306_draw_string(ssd, 5, 0, texto4);
+            render_on_display(ssd, &frame_area);
+        }
+        
     }
 
     
